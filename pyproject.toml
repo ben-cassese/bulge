@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bulge"
+version = "0.0.1"
+requires-python = ">=3.8"
+dependencies = [
+    "requests",
+    "black",
+    "astropy>5",
+]
+authors = [
+  {name = "Ben Cassese", email = "b.c.cassese@columbia.edu"},
+]
+license = {text = "MIT"}
+keywords = ["astronomy", "exoplanets"]
+description = "A package for dealing with non-spherical exoplanets"
+readme = "README.md"
+classifiers = [
+  "Programming Language :: Python",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Astronomy"
+]
+
+[project.urls]
+Homepage = "https://github.com/ben-cassese/bulge"
+Documentation = "https://github.com/ben-cassese/bulge"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.black]
+line-length = 79

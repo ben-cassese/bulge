@@ -1,2 +1,4 @@
 # bulge
-A package for non-spherical exoplanets
+A package for dealing with non-spherical exoplanets
+
+WIP!
