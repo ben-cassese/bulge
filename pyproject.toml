@@ -26,7 +26,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/ben-cassese/bulge"
-Documentation = "https://github.com/ben-cassese/bulge"
+Documentation = "https://bulge.readthedocs.io/en/latest/"
 
 [tool.setuptools]
 include-package-data = true
