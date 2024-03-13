@@ -104,8 +104,7 @@ def star_flux_integral(
     delta = jnp.abs(jnp.arctan2(jnp.sin(theta1-theta2), jnp.cos(theta1-theta2)))
     #jax.debug.print("weird delta {x}", x=delta)
 
-    # delta = jnp.abs(theta2 - theta1)
-    # delta = jnp.mod(delta, jnp.pi)
+    #jax.debug.print("star contribution {x}", x=delta / (2 * jnp.pi))
     return delta / (2 * jnp.pi)
 
 
@@ -166,6 +165,9 @@ def lightcurve(state, times):
         alphas = jnp.where(alphas < 0, alphas + 2 * jnp.pi, alphas)
         alphas = jnp.where(alphas > 2 * jnp.pi, alphas - 2 * jnp.pi, alphas)
         alphas = jnp.sort(alphas)
+        #jax.debug.print("xs {x}", x=xs)
+        #jax.debug.print("ys {x}", x=ys)
+        #jax.debug.print("alphas {x}", x=alphas)
 
         test_ang = alphas[0] + (alphas[1] - alphas[0]) / 2
         test_ang = jnp.where(
@@ -189,18 +191,39 @@ def lightcurve(state, times):
         func = jax.tree_util.Partial(
             planet_flux_integrand, u1=state["u1"], u2=state["u2"], **para
         )
-        full = quadgk(func, [0, 2 * jnp.pi], epsabs=epsabs, epsrel=epsrel)[
-            0
-        ] / (-(1 / 6) * jnp.pi * (-6 + 2 * state["u1"] + state["u2"]))
-        side1 = full - quadgk(
-            func, [alphas[0], alphas[1]], epsabs=epsabs, epsrel=epsrel
-        )[0] / (-(1 / 6) * jnp.pi * (-6 + 2 * state["u1"] + state["u2"]))
-        side2 = full - side1
-        #jax.debug.print("full {x}", x=full)
-        #jax.debug.print("side1 {x}", x=side1)
-        #jax.debug.print("side2 {x}", x=side2)
+        # full = quadgk(func, [0, 2 * jnp.pi], epsabs=epsabs, epsrel=epsrel)[
+        #     0
+        # ] / (-(1 / 6) * jnp.pi * (-6 + 2 * state["u1"] + state["u2"]))
+        
+        def testval_is_not_nan(_):
+            planet_contribution = quadgk(
+                func, [alphas[0], alphas[1]], epsabs=epsabs, epsrel=epsrel
+            )[0] / (-(1 / 6) * jnp.pi * (-6 + 2 * state["u1"] + state["u2"]))
+            return planet_contribution
+        def testval_is_nan(_):
+            # planet_contribution = 
+            
+            leg1 = quadgk(
+                func, [alphas[1], 2*jnp.pi], epsabs=epsabs, epsrel=epsrel
+            )[0]
+            leg2 = quadgk(
+                func, [0.0, alphas[0]], epsabs=epsabs, epsrel=epsrel
+            )[0]
+            planet_contribution = (leg1 + leg2) / (-(1 / 6) * jnp.pi * (-6 + 2 * state["u1"] + state["u2"]))
+            return planet_contribution
 
-        planet_contribution = jnp.where(~jnp.isnan(test_val), side2, side1)
+        planet_contribution = jax.lax.cond(
+            jnp.isnan(test_val),
+            testval_is_nan,
+            testval_is_not_nan,
+            ()
+        )
+        #jax.debug.print("planet_contribution {x}", x=planet_contribution)
+        # #jax.debug.print("full {x}", x=full)
+        # #jax.debug.print("side1 {x}", x=side1)
+        # #jax.debug.print("side2 {x}", x=side2)
+
+        # planet_contribution = jnp.where(~jnp.isnan(test_val), side2, side1)
         star_contribution = star_flux_integral(
             alpha1=alphas[0],
             alpha2=alphas[1],

@@ -1,2 +1,2 @@
-from system import *
+from bulge.system import *
 print("imported!")

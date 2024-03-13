@@ -66,8 +66,8 @@ class System:
             if key not in state_keys and (key != "q1" | key != "q2"):
                 raise ValueError(f"Invalid parameter '{key}'")
 
-        if state["e"] == 0:
-            assert state["omega"] == 0, "omega must be 0 for a circular orbit"
+        # if state["e"] == 0:
+        #     assert state["omega"] == 0, "omega must be 0 for a circular orbit"
 
         if "q1" in params.keys() or "q2" in params.keys():
             if not ("q1" in params.keys() and "q2" in params.keys()):
