@@ -15,3 +15,23 @@ files = {
 Do[
 Export[files[[v]],
  FortranForm[Simplify[coeffs[[v]][[2]]]]], {v,1,6}]
+
+intersectionSols = Simplify[Solve[{planet==1, Grad[planet, {x,y,z}] . {xc,yc,zc}  == 0, D[planet, z] == 0}, {x,y,z}]];
+
+files = {
+    "terminator_intersection_x1.txt",
+    "terminator_intersection_y1.txt",
+    "terminator_intersection_z1.txt"}
+
+Do[
+Export[files[[v]],
+ FortranForm[Simplify[intersectionSols[[1]][[v]][[2]]], {v,1,3}]]]
+
+files = {
+    "terminator_intersection_x2.txt",
+    "terminator_intersection_y2.txt",
+    "terminator_intersection_z2.txt"}
+
+Do[
+Export[files[[v]],
+ FortranForm[Simplify[intersectionSols[[2]][[v]][[2]]], {v,1,3}]]]

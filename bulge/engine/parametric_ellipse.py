@@ -3,7 +3,10 @@ import jax
 jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp
 
-
+# running into some numerical issues for very narrow ellipses-
+# e.g., the terminator for a spherical planet at f=1e-6. the rhos are ~1e14 there,
+# and the final value for c_y1 is off. everything is fine at f=1e-5 though, so leaving
+# for now
 @jax.jit
 def poly_to_parametric(rho_xx, rho_xy, rho_x0, rho_yy, rho_y0, rho_00):
     rho_00 -= 1
@@ -72,7 +75,9 @@ def cartesian_intersection_to_parametric_angle(
         def scan_func(alpha, _):
             return alpha - loss(alpha) / grad_loss(alpha), None
 
-        return jax.lax.scan(scan_func, 0.0, None, length=50)[0]
+        # if it starts on the actual value, will get nans
+        # previously had it start at 0, but in idealized cases used for testing it really is 0
+        return jax.lax.scan(scan_func, 0.123, None, length=50)[0] 
 
     alphas = jax.vmap(inner)(xs, ys)
     alphas = jnp.mod(alphas, 2 * jnp.pi)
